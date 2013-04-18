@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.trueffelscout.trueffelscout"
+    android:versionCode="5"
+    android:versionName="1.4"
+     >
+
+    
+    <uses-sdk
+    android:minSdkVersion="9"
+    android:targetSdkVersion="15" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<uses-permission android:name="android.permission.SEND_SMS"/>
+
+    <application
+        android:icon="@drawable/trufa"
+        android:theme="@style/Theme.Sherlock.Light" 
+        android:label="@string/app_name"
+        >
+        <activity
+            android:name=".TrueffelscoutActivity"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AboutUsActivity"
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
+            android:name="com.trueffelscout.trueffelscout.MessageActivity"
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <receiver 
+            android:name="com.trueffelscout.trueffelscout.TrueffelWidgetProvider"
+            android:label="@string/app_name"
+            >
+            <intent-filter>
+                <action
+                    android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+				android:name="android.appwidget.provider"
+				android:resource="@xml/widget" /> 
+        </receiver>
+        <service android:name="services.WidgetUpdateService"></service>
+    </application>
+
+</manifest>

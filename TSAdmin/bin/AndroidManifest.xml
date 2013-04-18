@@ -1,0 +1,68 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.trueffelscout.tsadmin"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="16" />
+    
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	
+	<permission android:name="com.trueffelscout.tsadmin.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+	<uses-permission android:name="com.trueffelscout.tsadmin.permission.C2D_MESSAGE" /> 
+    <uses-permission android:name= "com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <application
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".trueffels.TrueffelActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            
+        </activity>
+        <activity
+            android:name=".trueffels.TrueffelSettingsActivity"
+            android:screenOrientation="portrait"
+            >
+        </activity>
+        <activity
+            android:name=".messages.TSMessagesActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:configChanges="orientation|screenSize"
+            >
+        </activity>
+        <activity 
+            android:name=".messages.MessageActivity"
+            android:theme="@android:style/Theme.NoTitleBar"
+            />
+        
+        <service android:name=".gcm.GCMIntentService" />
+        
+        <receiver 
+            android:name=".gcm.GCMReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter >
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.trueffelscout.tsadmin" />
+            </intent-filter>
+        </receiver>
+        
+       
+        
+    </application>
+
+</manifest>

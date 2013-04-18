@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+   <item
+	    android:id="@+id/uber_uns"
+	    android:title="@string/uber_uns"
+	    android:icon="@drawable/uberuns"
+	    android:showAsAction="always"
+	    >
+	</item> 
+	<item
+	    android:id="@+id/contact"
+	    android:title="@string/contact" android:icon="@drawable/kontakt"
+	    android:showAsAction="always"
+	    >
+	</item>
+	<item
+	    android:id="@+id/refresh"
+	    android:title="@string/refresh" android:icon="@drawable/refresh"
+	    android:showAsAction="always"
+	    >
+	</item>
+	<item
+	    android:id="@+id/settings"
+	    android:title="@string/refresh" android:showAsAction="always"
+	    >
+	</item>
+	    
+</menu>

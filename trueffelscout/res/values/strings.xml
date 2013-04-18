@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resources>
+
+    <string name="hello">Hello World, TrueffelscoutActivity!</string>
+    <string name="app_name">Trueffelscout</string>
+    <string name="uber_uns">Über uns</string>
+    <string name="contact">Kontakt</string>
+    <string name="name_trufa_1">Sommertrüffel (Tuber aestivum - Tuber uncinatum)</string>
+    <string name="name_trufa_2">Weisse Trüffel (Tuber Magnatum)</string>
+    <string name="uber_uns_text">
+        Uns ist es sehr wichtig einen direkten Kontakt mit Ihnen, dem Kunden, zu haben, um Ihnen so einfach wie möglich die frischeste Ware anbieten zu können. Um dies zu gewährleisten, haben wir uns dem Verein angeschlossen. Wir möchten so, langfristig auf Zwischenhändler verzichten, um unsere Produkte noch schneller, noch frischer, direkt auf Ihren Tisch zu bringen.
+Ob beim Privatkunden oder im Restaurant - unsere nach EU Normen zertifizierten und getesteten Trüffel stehen für den besten Geschmack, das intensivste Aroma und die Frische, die nur in unseren Wäldern zu finden ist. Wir streben eine langfristige Zusammenarbeit mit Ihnen an, damit Sie auch in Zukunft von unseren fairen Preisen und unserer überragenden Qualität profitieren können.
+    </string>
+    <string name="not_availeble">Zurzeit nicht verfügbar</string>
+    <string name="form_name">Name</string>
+    <string name="form_tel">Telefon</string>
+    <string name="form_mail">Email</string>
+    <string name="form_msg">Nachricht</string>
+    <string name="refresh">Refresh</string>
+    
+    <string name="trufa1_widget">Sommertrüffel</string>
+    <string name="trufa2_widget">Weisse Trüffel</string>
+    <string name="info_preise">Alle Preise sind per kg.</string>
+    <string name="refresh_widg">Aktualisieren</string>
+    <string name="contact_call">Call</string>
+    <string name="contact_msg">Message</string>
+    <string name="contact_sms">SMS</string>
+
+</resources>

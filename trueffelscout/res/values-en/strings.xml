@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<resources>
+
+    <string name="hello">Hello World, TrueffelscoutActivity!</string>
+    <string name="app_name">Trueffelscout</string>
+    <string name="uber_uns">About us</string>
+    <string name="contact">Contact</string>
+    <string name="name_trufa_1">Summer truffles (Tuber aestivum - Tuber uncinatum)</string>
+    <string name="name_trufa_2">White truffles (Tuber Magnatum)</string>
+    <string name="uber_uns_text">
+        It is very important to us to have a direct commnication channel to you, our customer, in order to provide you the freshest goods. In order to achieve this, we have joined the union. We want to renounce the use of intermediate contractors, so our Products reach directly your table, faster and fresher.
+Private cusotmer or restaurant - our EU certified and tested truffels represent the wonderful taste, the most intensive aroma and the freshness, that can only be found in our woods. We are looking forward to a long-time cooperation with you, which will let you profit from our fair prices and overwhelming quality in the future as well.
+    </string>
+    <string name="not_availeble">Not available</string>
+    
+    <string name="form_name">Name</string>
+    <string name="form_tel">Phone</string>
+    <string name="form_mail">Email</string>
+    <string name="form_msg">Message</string>
+    <string name="refresh">Refresh</string>
+    
+    <string name="trufa1_widget">Summer truffles</string>
+    <string name="trufa2_widget">White truffles</string>
+    <string name="info_preise">All prices are per kg.</string>
+    <string name="refresh_widg">Refresh</string>
+    <string name="contact_call">Call</string>
+    <string name="contact_msg">Message</string>
+    <string name="contact_sms">SMS</string>
+
+</resources>

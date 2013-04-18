@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="edit_char_0" type="id"/>
+    <item name="edit_char_1" type="id"/>
+    <item name="edit_char_2" type="id"/>
+    <item name="edit_char_3" type="id"/>
+    <item name="edit_char_4" type="id"/>
+    <item name="edit_char_5" type="id"/>
+    
+    <item name="edit_price_0" type="id"/>
+    <item name="edit_price_1" type="id"/>
+    <item name="edit_price_2" type="id"/>
+    <item name="edit_price_3" type="id"/>
+    <item name="edit_price_4" type="id"/>
+    <item name="edit_price_5" type="id"/>
+    
+</resources>

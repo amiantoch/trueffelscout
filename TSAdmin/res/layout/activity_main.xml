@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+     >
+    
+     <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        style="@style/ActionBar"
+        />
+    
+    <LinearLayout
+        android:id="@+id/trufeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:weightSum="6" >
+    
+	    <ListView
+	        android:id="@+id/list_trufe"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="false"
+	        android:layout_marginLeft="5dp"
+	        android:layout_marginTop="10dp"
+	        android:layout_weight="6" >
+	
+	    </ListView>
+	
+	    <Button
+	        android:id="@+id/add_trufa_btn"
+	        android:layout_width="50dp"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="right"
+	        android:background="@drawable/ic_launcher"
+	        android:contentDescription="@string/add_truffa"
+	        android:onClick="addTrufa"
+	        android:text="+"
+	        android:textSize="25sp"
+	        android:textStyle="bold" />
+
+	</LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="150dp"
+        android:visibility="gone" />
+
+</LinearLayout>
