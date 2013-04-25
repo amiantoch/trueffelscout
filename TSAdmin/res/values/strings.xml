@@ -33,5 +33,14 @@
     <string name="register">Register</string>
     <string name="email">Email</string>
     <string name="name">Name</string>
+    
+    <string name="unit">€/kg</string>
+    <string name="unit_eur">€</string>
+    <string name="from">From</string>
+    <string name="tel">Tel:</string>
+    <string name="mail">Mail:</string>
+    <string name="reveived">Received:</string>
+    <string name="reply">Reply</string>
+    <string name="unregister">Unregister</string>
 
 </resources>

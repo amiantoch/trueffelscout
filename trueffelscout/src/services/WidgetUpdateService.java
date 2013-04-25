@@ -1,7 +1,9 @@
 package services;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +18,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -44,9 +49,11 @@ import android.renderscript.Font.Style;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.trueffelscout.trueffelscout.R;
-import com.trueffelscout.trueffelscout.TrueffelWidgetProvider;
-import com.trueffelscout.trueffelscout.TrueffelscoutActivity;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.trueffelscout.trueffelscoutapp.R;
+import com.trueffelscout.trueffelscoutapp.TrueffelWidgetProvider;
+import com.trueffelscout.trueffelscoutapp.TrueffelscoutActivity;
 
 public class WidgetUpdateService extends Service{
 	private PriceUpdateTask updater;
@@ -84,7 +91,7 @@ public class WidgetUpdateService extends Service{
 			views.setTextViewText(R.id.widget_pr12, "-");
 			views.setTextViewText(R.id.widget_pr22, "-");
 			views.setTextViewText(R.id.widget_pr32, "-");
-			views.setTextViewText(R.id.widget_last_update, "Keine Internet Verbindung!");
+			views.setTextViewText(R.id.widget_last_update, getResources().getString(R.string.no_internet_connection));
 		}
 		appWidgetManager.updateAppWidget(this.trueffelWidget, views);
 		if(!hasInternetConnection()){
@@ -156,43 +163,22 @@ public class WidgetUpdateService extends Service{
 		    	int responseCode = httpconn.getResponseCode();
 		    	
 		    	if(responseCode==HttpURLConnection.HTTP_OK){
-		    		InputStream is_xml = httpconn.getInputStream();
+		    		InputStream is = httpconn.getInputStream();
+		    		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+		    		String page= "";
+		    	    String inLine;
+		    	    while ((inLine = in.readLine()) != null){
+		    	     page += inLine;
+		    	    }
+		    	    in.close();
+
+	                JSONObject json = new JSONObject(page);
+	                JSONArray jArray = json.getJSONArray("trueffels");
+	                Gson gson = new Gson();
+	                List<Trueffel> trufe_loc = gson.fromJson(jArray.toString(), new TypeToken<List<Trueffel>>(){}.getType());
+		    		System.out.println(trufe_loc.toString());
+	                return trufe_loc;
 		    		
-		    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		    		DocumentBuilder db = dbf.newDocumentBuilder();
-		    		
-		    		Document dom = db.parse(is_xml);
-		    		Element doc_elem = dom.getDocumentElement();
-		    		NodeList nl = doc_elem.getElementsByTagName("trueffel");
-		    		if(nl.getLength()!=0){
-			    		for(int i=0;i<nl.getLength();i++){
-			    			Trueffel trufa = new Trueffel();
-			    			Element cat_node = (Element) nl.item(i);
-			    			Element name_node = (Element) cat_node.getElementsByTagName("name").item(0);
-			    			trufa.name = name_node.getTextContent();
-			    			Element category = (Element) cat_node.getElementsByTagName("categories").item(0);
-			    			NodeList categories = (NodeList) category.getChildNodes();
-			    			ArrayList<TrueffelType> types = new ArrayList<TrueffelType>();
-			    			String cat_str="";
-		    				int pr_int=0;
-			    			for(int j=0;j<categories.getLength();j++){
-			    				Element elem = (Element) categories.item(j);
-			    				if(elem.getTagName().equalsIgnoreCase("category")){
-			    					cat_str = elem.getTextContent();
-			    				}else if(elem.getTagName().equalsIgnoreCase("price")){
-			    					pr_int = Integer.parseInt(elem.getTextContent());
-			    				}
-			    				if((j%2==1)||(j==categories.getLength()-1)){
-			    					TrueffelType type = new TrueffelType();
-			    					type.type=cat_str;
-			    					type.price = pr_int;
-			    					types.add(type);
-			    				}
-			    			}
-			    			trufa.types = types;
-			    			trufe.add(trufa);
-			    		}
-		    		}
 		    	}
 			}catch (MalformedURLException e) {
 				e.printStackTrace();
@@ -200,12 +186,9 @@ public class WidgetUpdateService extends Service{
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;
-			} catch (ParserConfigurationException e) {
-					e.printStackTrace();
-					return null;
-			} catch (SAXException e) {
-					e.printStackTrace();
-					return null;
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} 
 			
 			return trufe;
@@ -215,45 +198,55 @@ public class WidgetUpdateService extends Service{
 		@Override
 		protected void onPostExecute(List<Trueffel> result){
 			if(result!=null&&result.size()>0){
-				if(result.get(0).types.get(0).price==0 && result.get(0).types.get(1).price==0){
-					views.setFloat(R.id.widget_pr1, "setTextSize", 8);
-					views.setTextViewText(R.id.widget_pr1, "Zurzeit nicht verfügbar");
+				
+				if(result.size()>2){
+					views.setViewVisibility(R.id.widget_special, View.VISIBLE);
+				}else{
+					views.setViewVisibility(R.id.widget_special, View.GONE);
+					views.setViewVisibility(R.id.widget_info, View.VISIBLE);
+				}
+				
+				if(result.get(0).categories.get(0).price==0 && result.get(0).categories.get(1).price==0){
+					views.setViewVisibility(R.id.not_availible_1, View.VISIBLE);
+					views.setTextViewText(R.id.not_availible_1, getResources().getString(R.string.not_availeble));
+					views.setTextViewText(R.id.widget_pr1, "");
 					views.setTextViewText(R.id.widget_pr2, "");
 				}else{
-					if(result.get(0).types.get(0).price!=0){
-						views.setFloat(R.id.widget_pr1, "setTextSize", 12);
-						views.setTextViewText(R.id.widget_pr1, "Kat.1: "+String.valueOf(result.get(0).types.get(0).price)+"€");
+					views.setViewVisibility(R.id.not_availible_1, View.GONE);
+					if(result.get(0).categories.get(0).price!=0){
+						views.setTextViewText(R.id.widget_pr1, "Kat.1: "+String.valueOf(result.get(0).categories.get(0).price)+ getResources().getString(R.string.unit_eur));
 					}else{
 						views.setTextViewText(R.id.widget_pr1, "");
 					}
-					if(result.get(0).types.get(1).price!=0){
+					if(result.get(0).categories.get(1).price!=0){
 						//views.setFloat(R.id.widget_pr2, "setTextSize", 12);
-						views.setTextViewText(R.id.widget_pr2, "Kat.2: "+String.valueOf(result.get(0).types.get(1).price)+"€");
+						views.setTextViewText(R.id.widget_pr2, "Kat.2: "+String.valueOf(result.get(0).categories.get(1).price)+ getResources().getString(R.string.unit_eur));
 					}else{
 						views.setTextViewText(R.id.widget_pr2, "");
 					}
 				}
-				if(result.get(1).types.get(0).price==0 && result.get(1).types.get(1).price==0 && result.get(1).types.get(2).price==0){
-					views.setFloat(R.id.widget_pr22, "setTextSize", 8);
-					views.setTextViewText(R.id.widget_pr22, "Zurzeit nicht verfügbar");
+				if(result.get(1).categories.get(0).price==0 && result.get(1).categories.get(1).price==0 && result.get(1).categories.get(2).price==0){
+					views.setViewVisibility(R.id.not_availible_2, View.VISIBLE);
+					views.setTextViewText(R.id.not_availible_2, getResources().getString(R.string.not_availeble));
 					views.setTextViewText(R.id.widget_pr12, "");
+					views.setTextViewText(R.id.widget_pr22, "");
 					views.setTextViewText(R.id.widget_pr32, "");
 				}else{
-					if(result.get(1).types.get(0).price!=0){
-						//views.setFloat(R.id.widget_pr12, "setTextSize", 12);
-						views.setTextViewText(R.id.widget_pr12, "Kat.1: "+String.valueOf(result.get(1).types.get(0).price)+"€");
+					views.setViewVisibility(R.id.not_availible_2, View.GONE);
+					if(result.get(1).categories.get(0).price!=0){
+						views.setTextViewText(R.id.widget_pr12, "Kat.1: "+String.valueOf(result.get(1).categories.get(0).price)+getResources().getString(R.string.unit_eur));
 					}else{
 						views.setTextViewText(R.id.widget_pr12, "");
 					}
-					if(result.get(1).types.get(1).price!=0){
+					if(result.get(1).categories.get(1).price!=0){
 						views.setFloat(R.id.widget_pr22, "setTextSize", 12);
-						views.setTextViewText(R.id.widget_pr22, "Kat.2: "+String.valueOf(result.get(1).types.get(1).price)+"€");
+						views.setTextViewText(R.id.widget_pr22, "Kat.2: "+String.valueOf(result.get(1).categories.get(1).price)+getResources().getString(R.string.unit_eur));
 					}else{
 						views.setTextViewText(R.id.widget_pr22, "");
 					}
-					if(result.get(1).types.get(2).price!=0){
+					if(result.get(1).categories.get(2).price!=0){
 						//views.setFloat(R.id.widget_pr32, "setTextSize", 12);
-						views.setTextViewText(R.id.widget_pr32, "Kat.3: "+String.valueOf(result.get(1).types.get(2).price)+"€");
+						views.setTextViewText(R.id.widget_pr32, "Kat.3: "+String.valueOf(result.get(1).categories.get(2).price)+getResources().getString(R.string.unit_eur));
 					}else{
 						views.setTextViewText(R.id.widget_pr32,"");
 					}
@@ -261,7 +254,7 @@ public class WidgetUpdateService extends Service{
 				
 				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 				Date date = new Date();
-				views.setTextViewText(R.id.widget_last_update, "Stand: "+dateFormat.format(date));
+				views.setTextViewText(R.id.widget_last_update, "Update:"+dateFormat.format(date));
 			}else{
 				views.setTextViewText(R.id.widget_pr1, "-");
 				views.setTextViewText(R.id.widget_pr12, "-");
@@ -273,3 +266,4 @@ public class WidgetUpdateService extends Service{
 		}
 	}
 }
+

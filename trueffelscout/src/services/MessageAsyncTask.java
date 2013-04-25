@@ -25,7 +25,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.widget.EditText;
 
-import com.trueffelscout.trueffelscout.R;
+import com.trueffelscout.trueffelscoutapp.R;
 
 public class MessageAsyncTask extends AsyncTask<String, Void, String> {
 	
@@ -42,7 +42,7 @@ public class MessageAsyncTask extends AsyncTask<String, Void, String> {
 	protected void onPreExecute(){
 		this.dialog = new ProgressDialog(this.activity);
 		dialog.show();
-		dialog.setMessage("Nachricht wird übermittelt");
+		dialog.setMessage(activity.getResources().getString(R.string.send_message));
 		
 	}
 	@Override
@@ -86,7 +86,7 @@ public class MessageAsyncTask extends AsyncTask<String, Void, String> {
 		}else{
 			try{
 				params[1].replace(System.getProperty("line.separator"), "");
-		    	String feed = "http://www.trueffelscout.de/mobile/save_mobile_message.php?key=biri&name="+params[1]+"&phone="+params[2]+"&mail="+params[3]+"&message="+params[4];
+		    	String feed = "http://www.trueffelscout.de/mobile/save_mobile_message.php?key=biri&name="+params[1]+"&phone="+params[2]+"&mail="+params[3]+"&message="+params[4]+"&language="+params[5];
 		    	url = new URL(feed);
 		    	
 		    	URLConnection connection = url.openConnection();

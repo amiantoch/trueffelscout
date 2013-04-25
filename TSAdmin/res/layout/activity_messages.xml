@@ -3,16 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-     <com.markupartist.android.widget.ActionBar
-        android:id="@+id/actionbar"
-        style="@style/ActionBar"
-        />
-	<TextView
-	    android:id="@+id/lblMessage"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    />
     <ViewFlipper 
         android:id="@+id/flipper_register"
         android:layout_width="match_parent"

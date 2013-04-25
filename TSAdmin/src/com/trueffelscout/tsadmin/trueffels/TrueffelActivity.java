@@ -15,8 +15,6 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,9 +26,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ActionBar.Action;
-import com.markupartist.android.widget.ActionBar.IntentAction;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.trueffelscout.tsadmin.R;
 import com.trueffelscout.tsadmin.TSActivity;
 import com.trueffelscout.tsadmin.messages.TSMessagesActivity;
@@ -46,7 +43,6 @@ public class TrueffelActivity extends TSActivity{
     private BroadcastReceiver mNetworkStateIntentReceiver;
     private ListView truf_list;
     private ArrayAdapter<Trueffel> adapter;
-    private ActionBar actionBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +50,7 @@ public class TrueffelActivity extends TSActivity{
         setContentView(R.layout.activity_main);
         
         this.SCREEN_ORIENTATION = getScreenOrientation();
-        initActionBar();
+        getSupportActionBar().setTitle("Home");
        	checkNetwork();
         initListView();
         
@@ -77,23 +73,14 @@ public class TrueffelActivity extends TSActivity{
 								dialog.dismiss();
 							}
 							((ProgressBar)findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
-							if(getTrufe().size()>=0 && actionBar!=null){
-								actionBar.setProgressBarVisibility(View.VISIBLE);
+							if(getTrufe().size()>=0){
+								setSupportProgressBarIndeterminate(true);
 							}
 							new TrueffelAsyncTask(TrueffelActivity.this).execute(new String[]{"http://www.trueffelscout.de/mobile/TSadmin.php"});
 						}
 					}
 		    }
 		};
-    }
-    
-    private void initActionBar(){
-    	actionBar = (ActionBar) findViewById(R.id.actionbar);
-        //actionBar.setHomeAction(new IntentAction(this, createIntent(this), R.drawable.ic_title_home_demo));
-        actionBar.setTitle("Home");
-        
-        final Action messageAction = new IntentAction(TrueffelActivity.this, new Intent(TrueffelActivity.this, TSMessagesActivity.class), R.drawable.kontakt);
-        actionBar.addAction(messageAction);
     }
     
     private void initListView(){
@@ -119,18 +106,20 @@ public class TrueffelActivity extends TSActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        getSupportMenuInflater().inflate(R.menu.activity_main, menu);
+        menu.findItem(R.id.menu_messages).setIntent(new Intent(TrueffelActivity.this, TSMessagesActivity.class));
         return true;
     }
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
+            case R.id.menu_messages:
+                //NavUtils.navigateUpFromSameTask(this);
+            	startActivity(item.getIntent());
+            	break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;//super.onOptionsItemSelected(item);
     }
     
     @Override
@@ -180,9 +169,7 @@ public class TrueffelActivity extends TSActivity{
 		findViewById(R.id.trufeLayout).setVisibility(View.VISIBLE);
 		ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar);
 		pb.setVisibility(View.GONE);
-		if(actionBar!=null){
-			actionBar.setProgressBarVisibility(View.GONE);
-		}
+		setSupportProgressBarIndeterminateVisibility(false);
 	}
 	
 	public void addTrufa(View view){
@@ -242,15 +229,15 @@ public class TrueffelActivity extends TSActivity{
 	        vis.setText(trufa.visibility);
 	        if(trufa.types!=null){
 	        if(trufa.types.size()>0 && trufa.types.size()<=3)
-	        	if(trufa.types.get(0).price>0)
-	        		pr1.setText("1. "+String.valueOf(trufa.types.get(0).price)+"�/kg");
+	        	if(trufa.types.get(0).price>=0)
+	        		pr1.setText("1. "+String.valueOf(trufa.types.get(0).price)+" "+getResources().getString(R.string.unit));
 	        	else
 	        		pr1.setText("");
 	        	if(trufa.types.size()>1)
-	        		pr2.setText("2. "+String.valueOf(trufa.types.get(1).price)+"�/kg");
+	        		pr2.setText("2. "+String.valueOf(trufa.types.get(1).price)+" "+getResources().getString(R.string.unit));
 	        	else pr2.setText("");
 	        	if(trufa.types.size()==3)
-	        		pr3.setText("3. "+String.valueOf(trufa.types.get(2).price)+"�/kg");
+	        		pr3.setText("3. "+String.valueOf(trufa.types.get(2).price)+" "+getResources().getString(R.string.unit));
 	        	else pr3.setText("");
 	        	TextView upt = (TextView)v.findViewById(R.id.modif_date);
 	        	upt.setText(trufa.types.get(0).date);

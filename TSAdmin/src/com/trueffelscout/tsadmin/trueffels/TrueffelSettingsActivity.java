@@ -49,6 +49,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.view.MenuItem;
 import com.trueffelscout.tsadmin.R;
 import com.trueffelscout.tsadmin.TSActivity;
 import com.trueffelscout.tsadmin.model.Trueffel;
@@ -72,10 +73,13 @@ public class TrueffelSettingsActivity extends TSActivity {
 		setContentView(R.layout.trufa_settings);
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		
 		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.back);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
         bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-        getWindow().setBackgroundDrawable(bitmapDrawable);
+        //getWindow().setBackgroundDrawable(bitmapDrawable);
 		
         
         this.id_trufa = this.getIntent().getIntExtra("id",ADD_TRUFA);
@@ -168,6 +172,15 @@ public class TrueffelSettingsActivity extends TSActivity {
 			}
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	        break; 
+	    }
+	    return true;
+	}
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if(requestCode == CAM_REQUEST && resultCode == RESULT_OK){
 			this.newImgBmp = (Bitmap) data.getExtras().get("data");

@@ -4,9 +4,6 @@ import static com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities.SENDER_ID;
 import static com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities.SETTINGS;
 import static com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities.displayMessage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -15,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.trueffelscout.tsadmin.R;
@@ -56,14 +54,18 @@ public class GCMIntentService extends GCMBaseIntentService {
 		SharedPreferences sp = context.getSharedPreferences(SETTINGS, Activity.MODE_PRIVATE);
 		String user = sp.getString("user", "");
 		String email = sp.getString("email", "");
-		displayMessage(context, getString(R.string.server_register));
+		sp.edit().putString("REG_ID", regId).commit();
+		CommonUtilities.REG_ID=regId;
+		//displayMessage(context, );
+		Toast.makeText(context, getString(R.string.server_register), Toast.LENGTH_LONG);
 		ServerUtilities.register(context, regId, user, email);
 	}
 
 	@Override
 	protected void onUnregistered(Context context, String regId) {
 		Log.v(TAG,"device unregistered");
-		displayMessage(context, getString(R.string.server_unregister));
+		Toast.makeText(context, getString(R.string.server_unregister), Toast.LENGTH_LONG);
+		//displayMessage(context, getString(R.string.server_unregister));
         ServerUtilities.unregister(context, regId, "ami");
 	}
 	

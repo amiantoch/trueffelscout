@@ -2,19 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
-    <Button
+    <ImageView
         android:id="@+id/iv_en"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/btn_star"
+        android:src="@drawable/en"
         android:text="EN" />
 
-    <Button
+    <ImageView
         android:id="@+id/iv_de"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/de"
         android:text="DE" />
 
 </LinearLayout>

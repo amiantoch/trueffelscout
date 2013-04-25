@@ -2,8 +2,8 @@ package views;
 
 import java.util.Locale;
 
-import com.trueffelscout.trueffelscout.R;
-import com.trueffelscout.trueffelscout.TrueffelscoutActivity;
+import com.trueffelscout.trueffelscoutapp.R;
+import com.trueffelscout.trueffelscoutapp.TrueffelscoutActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -33,7 +33,7 @@ public class SettingsDialog extends Dialog {
 			public void onClick(View v) {
 				changeLanguage("en");
 				if(activity instanceof TrueffelscoutActivity){
-					((TrueffelscoutActivity) activity).updateTrueffel();
+					//((TrueffelscoutActivity) activity).updateTrueffel();
 				}
 				dismiss();
 			}
@@ -43,7 +43,7 @@ public class SettingsDialog extends Dialog {
 			public void onClick(View v) {
 				changeLanguage("de");
 				if(activity instanceof TrueffelscoutActivity){
-					((TrueffelscoutActivity) activity).updateTrueffel();
+					//((TrueffelscoutActivity) activity).updateTrueffel();
 				}
 				dismiss();
 			}

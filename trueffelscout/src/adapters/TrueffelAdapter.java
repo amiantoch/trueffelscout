@@ -5,9 +5,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import com.trueffelscout.trueffelscout.TrueffelscoutActivity;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.trueffelscout.trueffelscoutapp.R;
+import com.trueffelscout.trueffelscoutapp.TrueffelscoutActivity;
 
-import com.trueffelscout.trueffelscout.R;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,18 +30,42 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class TrueffelAdapter extends ArrayAdapter<Trueffel> {
+	private static final String HOST="http://www.trueffelscout.de";
 	
 	private List<Trueffel> items;
 	private int resourceId;
 	private TrueffelscoutActivity context;
+	private ImageLoader imgLoader;
+	private DisplayImageOptions options;
 	
 	public TrueffelAdapter(Context context, int resourceId, List<Trueffel> objects) {
 		super(context, resourceId, objects);
 		this.items=objects;
 		this.resourceId=resourceId;
 		this.context=(TrueffelscoutActivity)context;
+		if(imgLoader==null){
+			imgLoader = ImageLoader.getInstance();
+			if(!imgLoader.isInited()){
+				imgLoader.init(ImageLoaderConfiguration.createDefault(getContext()));
+			}
+			options=new DisplayImageOptions.Builder()
+			//.showStubImage(R.drawable.)
+			//.showImageForEmptyUri(R.drawable.ic_empty)
+			.showImageOnFail(R.drawable.trufa)
+			.cacheInMemory()
+			.cacheOnDisc()
+			.displayer(new RoundedBitmapDisplayer(20))
+			.build();
+
+		}
 	}
 	
+	@Override
+	public int getCount(){
+		return items.size();
+	}
+	
+	@Override
 	public View getView(int position, View convertView, ViewGroup parent){
 		View v = convertView;
 		
@@ -59,9 +90,31 @@ public class TrueffelAdapter extends ArrayAdapter<Trueffel> {
             		name.setText(item.name);
                 name.setTypeface(tf);
             }
-            ImageView img = (ImageView) v.findViewById(R.id.image);
-            if(img!=null){
-            	img.setImageDrawable(item.image);
+            if(item.image!=null){
+	            ImageView img = (ImageView) v.findViewById(R.id.image);
+	            if(img!=null){
+	            	
+	            	imgLoader.displayImage(HOST+item.image,  img,options, new ImageLoadingListener() {
+						
+						public void onLoadingStarted(String arg0, View arg1) {
+							
+						}
+						
+						public void onLoadingFailed(String arg0, View arg1, FailReason arg2) {
+													
+						}
+						
+						public void onLoadingComplete(String arg0, View view, Bitmap arg2) {
+							((ImageView)view).setImageBitmap(arg2);
+						}
+						
+						public void onLoadingCancelled(String arg0, View arg1) {
+							// TODO Auto-generated method stub
+							
+						}
+	            	});
+	            	
+	            }
             }
             ProgressBar pb = (ProgressBar) v.findViewById(R.id.progressBar);
             if(!context.hasInternetConnection()){
@@ -81,43 +134,43 @@ public class TrueffelAdapter extends ArrayAdapter<Trueffel> {
 			cat3.setTypeface(tf);
 			TextView pr3 = (TextView)v.findViewById(R.id.price3);
 			pr3.setTypeface(tf);
-            if(item.types!=null){
-	            for(int i=0;i<item.types.size();i++){
+            if(item.categories!=null){
+	            for(int i=0;i<item.categories.size();i++){
 	    			pb.setVisibility(View.GONE);
 	    			cat3.setText("");
 	    			pr3.setText("");
 	            	if(i==0){
 	            		if(context.getResources().getConfiguration().locale.getLanguage().equalsIgnoreCase("en"))
-	                		cat1.setText(item.types.get(i).type_en);
+	                		cat1.setText(item.categories.get(i).category_en);
 	            		else
-	            			cat1.setText(item.types.get(i).type);
-	            		if(item.types.get(i).price==0){
+	            			cat1.setText(item.categories.get(i).category);
+	            		if(item.categories.get(i).price==0){
 	            			pr1.setTextSize(12);
 	            			pr1.setText(context.getResources().getString(R.string.not_availeble));
 	            		}else{
-	            			pr1.setText(String.valueOf(item.types.get(i).price)+"€/kg");
+	            			pr1.setText(String.valueOf(item.categories.get(i).price)+ context.getResources().getString(R.string.unit));
 	            		}
 	            	}else if(i==1){
 	            		if(context.getResources().getConfiguration().locale.getLanguage().equalsIgnoreCase("en"))
-	                		cat2.setText(item.types.get(i).type_en);
+	                		cat2.setText(item.categories.get(i).category_en);
 	            		else
-	            			cat2.setText(item.types.get(i).type);
-	            		if(item.types.get(i).price==0){
+	            			cat2.setText(item.categories.get(i).category);
+	            		if(item.categories.get(i).price==0){
 	            			pr2.setTextSize(12);
 	            			pr2.setText(context.getResources().getString(R.string.not_availeble));
 	            		}else{
-	            			pr2.setText(String.valueOf(item.types.get(i).price)+"€/kg");
+	            			pr2.setText(String.valueOf(item.categories.get(i).price)+ context.getResources().getString(R.string.unit));
 	            		}
 	            	}else if(i==2){
 	            		if(context.getResources().getConfiguration().locale.getLanguage().equalsIgnoreCase("en"))
-	                		cat3.setText(item.types.get(i).type_en);
+	                		cat3.setText(item.categories.get(i).category_en);
 	            		else
-	            			cat3.setText(item.types.get(i).type);
-	            		if(item.types.get(i).price==0){
+	            			cat3.setText(item.categories.get(i).category);
+	            		if(item.categories.get(i).price==0){
 	            			pr3.setTextSize(12);
 	            			pr3.setText(context.getResources().getString(R.string.not_availeble));
 	            		}else{
-	            			pr3.setText(String.valueOf(item.types.get(i).price)+"€/kg");
+	            			pr3.setText(String.valueOf(item.categories.get(i).price)+ context.getResources().getString(R.string.unit));
 	            		}
 	            	}
 	            }

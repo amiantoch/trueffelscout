@@ -1,7 +1,10 @@
 package adapters;
 
 public class TrueffelType {
-	public String type;
+	public int id_category;
+	public String category;
 	public int price;
-	public String type_en;
+	public String category_en;
+	public String date;
+	
 }

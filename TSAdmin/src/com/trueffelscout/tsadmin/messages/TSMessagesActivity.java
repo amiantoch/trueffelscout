@@ -2,7 +2,10 @@ package com.trueffelscout.tsadmin.messages;
 
 import static com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities.SETTINGS;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,9 +16,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,12 +29,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-
-import com.google.android.gcm.GCMRegistrar;
-import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ActionBar.Action;
-import com.markupartist.android.widget.ActionBar.IntentAction;
 import com.trueffelscout.tsadmin.R;
+
+import com.actionbarsherlock.ActionBarSherlock;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gcm.GCMRegistrar;
 import com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities;
 import com.trueffelscout.tsadmin.gcm.utilities.ServerUtilities;
 import com.trueffelscout.tsadmin.gcm.utilities.WakeLocker;
@@ -39,7 +43,7 @@ import com.trueffelscout.tsadmin.model.Message;
 import com.trueffelscout.tsadmin.services.MessagesAsynkTask;
 import com.trueffelscout.tsadmin.trueffels.TrueffelActivity;
 
-public class TSMessagesActivity extends Activity {
+public class TSMessagesActivity extends SherlockActivity {
 	private static final String MSG_ID = "seen_message_id";
 	
 	private AsyncTask<Void, Void, Void> mRegisterTask;
@@ -51,7 +55,8 @@ public class TSMessagesActivity extends Activity {
 	private ListView msgList;
 	private MessageAdapter adapter;
 	private SharedPreferences sp;
-	private ActionBar ab;
+	private ActionBarSherlock ab;
+	private ViewFlipper flipper;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,14 +64,38 @@ public class TSMessagesActivity extends Activity {
         setContentView(R.layout.activity_messages);
         
         sp = this.getSharedPreferences(SETTINGS, Activity.MODE_PRIVATE);
+        flipper = (ViewFlipper) findViewById(R.id.flipper_register);
          
-        
+        getSupportActionBar().setTitle(R.string.messages);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
         setMessagesList();
-        initActionBar();
         if(savedInstanceState==null)
         	initGCMRegistration();
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		 getSupportMenuInflater().inflate(R.menu.activity_massages, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case android.R.id.home:
+	        finish();
+	        break; 
+	    case R.id.menu_settings:
+	    	register();
+	    	break;
+	    }
+	    return true;
+	}
+	
+	
+	
+	/*
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -75,10 +104,10 @@ public class TSMessagesActivity extends Activity {
 	        return true;  
 	    }
 	    return true;
-	}
+	}*/
 	
-	private void initActionBar(){
-    	ab = (ActionBar) findViewById(R.id.actionbar);
+	/*private void initActionBar(){
+    	getSupportActionBar();
         //actionBar.setHomeAction(new IntentAction(this, createIntent(this), R.drawable.ic_title_home_demo));
         ab.setTitle(getString(R.string.messages));
 
@@ -90,7 +119,7 @@ public class TSMessagesActivity extends Activity {
         ab.addAction(settingsAction);
         
         
-    }
+    }*/
 	
 	private void initGCMRegistration(){
 		
@@ -101,7 +130,7 @@ public class TSMessagesActivity extends Activity {
         // while developing the app, then uncomment it when it's ready.
         GCMRegistrar.checkManifest(this);
  
-        lblMessage = (TextView) findViewById(R.id.lblMessage);
+        //lblMessage = (TextView) findViewById(R.id.lblMessage);
  
         registerReceiver(mHandleMessageReceiver, new IntentFilter(CommonUtilities.DISPLAY_MESSAGE_ACTION));
  
@@ -120,7 +149,7 @@ public class TSMessagesActivity extends Activity {
             // Device is already registered on GCM
             if (GCMRegistrar.isRegisteredOnServer(this)) {
             	Toast.makeText(getApplicationContext(), "Already registered with GCM", Toast.LENGTH_LONG).show();
-            	ab.setProgressBarVisibility(View.VISIBLE);
+            	setSupportProgressBarIndeterminateVisibility(true);
             	new MessagesAsynkTask(this).execute(new String[]{});
             } else {
                 // Try to register again, but not in the UI thread.
@@ -143,7 +172,7 @@ public class TSMessagesActivity extends Activity {
  
                 };
                 mRegisterTask.execute(null, null, null);
-                ab.setProgressBarVisibility(View.VISIBLE);
+                setSupportProgressBarIndeterminateVisibility(true);
                 new MessagesAsynkTask(TSMessagesActivity.this).execute(new String[]{});
             }
         }
@@ -157,6 +186,11 @@ public class TSMessagesActivity extends Activity {
             String newPhone = intent.getExtras().getString(CommonUtilities.EXTRA_PHONE);
             String newMail = intent.getExtras().getString(CommonUtilities.EXTRA_MAIL);
             String newDate = intent.getExtras().getString(CommonUtilities.EXTRA_DATE);
+            if(newDate==null){
+            	Time now = new Time();
+            	now.setToNow();
+            	newDate = now.toString();
+            }
             Message message = new Message(newName, newPhone, newMail, newMessage, newDate);
             // Waking up mobile if it is sleeping
             WakeLocker.acquire(getApplicationContext());
@@ -183,7 +217,6 @@ public class TSMessagesActivity extends Activity {
     };
     
     private void register(){
-    	final ViewFlipper flipper = (ViewFlipper) findViewById(R.id.flipper_register);
     	flipper.setInAnimation(this, R.anim.left_in);
     	flipper.setOutAnimation(TSMessagesActivity.this, R.anim.left_out);
     	flipper.showNext();
@@ -200,7 +233,21 @@ public class TSMessagesActivity extends Activity {
 				spEdit.putString("user", user.getText().toString());
 				spEdit.putString("email", email.getText().toString());
 				spEdit.commit();
-				//GCMRegistrar.register(TSMessagesActivity.this, SENDER_ID);
+				GCMRegistrar.register(TSMessagesActivity.this, CommonUtilities.SENDER_ID);
+				flipper.showPrevious();
+			}
+		});
+    	
+    	Button btnUnreg = (Button) findViewById(R.id.btnRegister);
+    	btnUnreg.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				sp = TSMessagesActivity.this.getSharedPreferences(SETTINGS, Activity.MODE_PRIVATE);
+				Editor spEdit = sp.edit();
+				spEdit.putString("user", user.getText().toString());
+				spEdit.putString("email", email.getText().toString());
+				spEdit.commit();
+				GCMRegistrar.unregister(TSMessagesActivity.this);
 				flipper.showPrevious();
 			}
 		});
@@ -226,8 +273,12 @@ public class TSMessagesActivity extends Activity {
  
     @Override
 	public void onBackPressed() {
-	    finish();
-	    super.onBackPressed();
+	   // finish();
+    	if(flipper!=null && flipper.getDisplayedChild()==1){
+    		flipper.showPrevious();
+    	}else{
+    		super.onBackPressed();
+    	}
 	}
     
     @Override
@@ -245,7 +296,7 @@ public class TSMessagesActivity extends Activity {
     }
 
 	public void update(ArrayList<Message> messages) {
-		ab.setProgressBarVisibility(View.GONE);
+		setSupportProgressBarIndeterminateVisibility(false);
 		this.messages = messages;
 		if(msgSeenId == null){
 			msgSeenId = new int[messages.size()];
@@ -267,18 +318,22 @@ public class TSMessagesActivity extends Activity {
 	            LayoutInflater inflater = TSMessagesActivity.this.getLayoutInflater();
 	            v = inflater.inflate(R.layout.tsmessages_item, parent, false);
 			}
-			if(msgSeenId[position]==0){
+			if(msgSeenId==null || msgSeenId[position]==0){
 				v.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
 			}
             TextView name = (TextView)v.findViewById(R.id.user_name);
-            String who = messages.get(position).getName().length()>0?messages.get(position).getName():
-            	messages.get(position).getMail();
+            if(messages.get(position).getName()!=null){
+	            String who = messages.get(position).getName().length()>0?messages.get(position).getName():
+	            	messages.get(position).getMail();
+            }
             name.setText(messages.get(position).getName());
-            String msgTxt = messages.get(position).getMessage().length()>30?
-            		messages.get(position).getMessage().substring(0, 30)+"...":
-            			messages.get(position).getMessage();
-            TextView msg = (TextView)v.findViewById(R.id.user_msg);
-            msg.setText(msgTxt);
+            if(messages.get(position).getMessage()!=null){
+	            String msgTxt = messages.get(position).getMessage().length()>30?
+	            		messages.get(position).getMessage().substring(0, 30)+"...":
+	            			messages.get(position).getMessage();
+	            TextView msg = (TextView)v.findViewById(R.id.user_msg);
+	            msg.setText(msgTxt);
+            }
             TextView date = (TextView)v.findViewById(R.id.msg_date);
             date.setText(messages.get(position).getDate());
 			

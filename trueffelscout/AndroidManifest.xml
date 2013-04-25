@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.trueffelscout.trueffelscout"
-    android:versionCode="5"
-    android:versionName="1.4"
+    package="com.trueffelscout.trueffelscoutapp"
+    android:versionCode="8"
+    android:versionName="1.7"
      >
 
     
@@ -16,14 +16,16 @@
 	<uses-permission android:name="android.permission.SEND_SMS"/>
 
     <application
+        android:name=".TsApplication"
         android:icon="@drawable/trufa"
         android:theme="@style/Theme.Sherlock.Light" 
         android:label="@string/app_name"
         >
         <activity
             android:name=".TrueffelscoutActivity"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="orientation|screenSize|locale"
             android:uiOptions="splitActionBarWhenNarrow"
+            android:screenOrientation="portrait"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,15 +36,16 @@
         <activity
             android:name=".AboutUsActivity"
             android:screenOrientation="portrait"
+             android:uiOptions="splitActionBarWhenNarrow"
             >
         </activity>
         <activity
-            android:name="com.trueffelscout.trueffelscout.MessageActivity"
+            android:name=".MessageActivity"
             android:screenOrientation="portrait"
             >
         </activity>
         <receiver 
-            android:name="com.trueffelscout.trueffelscout.TrueffelWidgetProvider"
+            android:name=".TrueffelWidgetProvider"
             android:label="@string/app_name"
             >
             <intent-filter>

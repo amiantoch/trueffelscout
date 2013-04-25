@@ -2,15 +2,15 @@ package com.trueffelscout.tsadmin;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Display;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.trueffelscout.tsadmin.model.Message;
 import com.trueffelscout.tsadmin.model.Trueffel;
 
-public abstract class TSActivity extends Activity {
+public abstract class TSActivity extends SherlockActivity {
 	
 	protected static Message message_; 
 	

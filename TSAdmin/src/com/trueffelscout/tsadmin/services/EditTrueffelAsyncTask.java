@@ -83,8 +83,10 @@ public class EditTrueffelAsyncTask extends AsyncTask<String, Void, String> {
 	
 	@Override
 	protected void onPostExecute(String result){
-		new TrueffelAsyncTask(this.activity).execute(new String[]{"http://www.trueffelscout.de/mobile/TSadmin.php"});
-		Toast.makeText(activity, result, Toast.LENGTH_SHORT).show();
+		if(result!=null){
+			new TrueffelAsyncTask(this.activity).execute(new String[]{"http://www.trueffelscout.de/mobile/TSadmin.php"});
+			//Toast.makeText(activity, result, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 }

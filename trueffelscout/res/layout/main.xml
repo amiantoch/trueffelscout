@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:orientation="vertical" >
 
         <ListView
@@ -22,6 +22,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="bottom"
         android:layout_weight="1"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="vertical" >
@@ -39,8 +40,7 @@
             android:layout_height="100dp"
             android:layout_gravity="center_vertical|center_horizontal"
             android:onClick="open_contact_dialog"
-            android:scaleType="fitStart"
-            android:src="@drawable/buton_kontakt" />
+            android:scaleType="fitStart" />
         
     </LinearLayout>
 

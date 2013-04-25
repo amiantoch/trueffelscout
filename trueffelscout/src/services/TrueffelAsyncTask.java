@@ -1,7 +1,9 @@
 package services;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketException;
@@ -13,20 +15,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import com.trueffelscout.trueffelscout.TrueffelscoutActivity;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
-import com.trueffelscout.trueffelscout.R;
+import com.trueffelscout.trueffelscoutapp.R;
+import com.trueffelscout.trueffelscoutapp.TrueffelscoutActivity;
+
 import adapters.Trueffel;
-import adapters.TrueffelType;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
@@ -65,8 +66,23 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,List<Trueffel>>{
 	    	int responseCode = httpconn.getResponseCode();
 	    	
 	    	if(responseCode==HttpURLConnection.HTTP_OK){
-	    		InputStream is_xml = httpconn.getInputStream();
+	    		InputStream is = httpconn.getInputStream();
+	    		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+	    		String page= "";
+	    	    String inLine;
+	    	    while ((inLine = in.readLine()) != null){
+	    	     page += inLine;
+	    	    }
+	    	    in.close();
 	    		
+
+                JSONObject json = new JSONObject(page);
+                JSONArray jArray = json.getJSONArray("trueffels");
+                Gson gson = new Gson();
+                List<Trueffel> trufe_loc = gson.fromJson(jArray.toString(), new TypeToken<List<Trueffel>>(){}.getType());
+	    		System.out.println(trufe_loc.toString());
+                return trufe_loc;
+                /*
 	    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    		DocumentBuilder db = dbf.newDocumentBuilder();
 	    		
@@ -121,8 +137,9 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,List<Trueffel>>{
 		    			}else{
 		    				trufe.add(trufa);
 		    		}
-		    		}
-	    		}
+		    		}  
+	    		}  */
+	    		
 	    	}
 		}catch (SocketException e){
 			e.printStackTrace();
@@ -133,15 +150,13 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,List<Trueffel>>{
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
-		} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-				return null;
-		} catch (SAXException e) {
-				e.printStackTrace();
-				return null;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch(JsonSyntaxException ex){
+			ex.printStackTrace();
 		}
-		
-		return trufe;
+		return null;
 	}
 	
 	@Override
@@ -150,12 +165,12 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,List<Trueffel>>{
 		if(result==null){
 			//Toast.makeText(activity, "No prices availible!", Toast.LENGTH_SHORT).show();
 		}else{
-			this.adapter.notifyDataSetChanged();
-			this.activity.setListAdapter(adapter);
+			//this.adapter.notifyDataSetChanged();
+			this.activity.updateTrueffel(result);//.setListAdapter(adapter);
 			TextView upd_txt = (TextView) activity.findViewById(R.id.main_update);
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 			Date date = new Date();
-			upd_txt.setText("Stand: "+dateFormat.format(date));
+			upd_txt.setText(activity.getResources().getString(R.string.updated)+dateFormat.format(date));
 		}
 	}
 	

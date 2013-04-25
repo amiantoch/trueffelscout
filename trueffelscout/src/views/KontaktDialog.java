@@ -8,13 +8,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import com.trueffelscout.trueffelscout.MessageActivity;
-import com.trueffelscout.trueffelscout.R;
+import com.trueffelscout.trueffelscoutapp.MessageActivity;
+import com.trueffelscout.trueffelscoutapp.R;
+import com.trueffelscout.trueffelscoutapp.TsApplication;
 
 public class KontaktDialog extends Dialog implements OnClickListener {
-	  ImageView call, msg, sms;
-	  Activity mActivity;
+	  private ImageView call, msg, sms;
+	  private Activity mActivity;
+	  private String phone;
 	
 	  public KontaktDialog(Activity activity) {      
 	    super(activity);
@@ -27,6 +30,7 @@ public class KontaktDialog extends Dialog implements OnClickListener {
 		msg.setOnClickListener(this);
 		sms = (ImageView)findViewById(R.id.send_sms);
 		sms.setOnClickListener(this);
+		phone = ((TsApplication)activity.getApplication()).getPhone();
 	  }
 	
 	  public void onClick(View v) {       
@@ -40,9 +44,13 @@ public class KontaktDialog extends Dialog implements OnClickListener {
 	  }
 	  
 	  public void call_biri(){
-		dismiss();
-		Intent i = new Intent(Intent.ACTION_CALL, Uri.parse("tel:+491791879581"));
-	    this.mActivity.startActivity(i);
+		  if(phone==null){
+			  Toast.makeText(this.mActivity, mActivity.getResources().getString(R.string.phone_not_availible), Toast.LENGTH_SHORT).show();
+		  }else{
+				dismiss();
+				Intent i = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+phone));
+			    this.mActivity.startActivity(i);
+		  }
 	  }
 	  public void message_biri(){
 		dismiss();
@@ -53,10 +61,14 @@ public class KontaktDialog extends Dialog implements OnClickListener {
 		msg_dialog.show();*/
 	  }
 	  public void sms_biri(){
-		  Uri uri = Uri.parse("smsto:+491791879581");   
-		  Intent it = new Intent(Intent.ACTION_SENDTO, uri);   
-		  it.putExtra("sms_body", "Hallo, ich hätte Interesse an Ihren Produkten.");   
-		  mActivity.startActivity(it); 
+		  if(phone!=null){
+			  Uri uri = Uri.parse("smsto:"+phone);   
+			  Intent it = new Intent(Intent.ACTION_SENDTO, uri);   
+			  it.putExtra("sms_body", this.mActivity.getResources().getString(R.string.sms_body));   
+			  mActivity.startActivity(it); 
+		  }else{
+			  Toast.makeText(this.mActivity, mActivity.getResources().getString(R.string.phone_not_availible), Toast.LENGTH_SHORT).show();
+		  }
 	  }
 
 }

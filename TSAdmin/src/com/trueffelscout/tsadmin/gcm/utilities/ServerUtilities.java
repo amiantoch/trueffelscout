@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.trueffelscout.tsadmin.R;
@@ -49,7 +50,8 @@ public class ServerUtilities{
         post(serverUrl, params);
         GCMRegistrar.setRegisteredOnServer(context, false);
         String message = context.getString(R.string.server_unregister);
-        CommonUtilities.displayMessage(context, message);
+        Toast.makeText(context, message, Toast.LENGTH_LONG);
+        //CommonUtilities.displayMessage(context, message);
     }
 	
 	public static String post(String urlStr, String params){
