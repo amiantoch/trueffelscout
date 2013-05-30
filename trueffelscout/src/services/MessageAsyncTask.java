@@ -86,11 +86,14 @@ public class MessageAsyncTask extends AsyncTask<String, Void, String> {
 		}else{
 			try{
 				params[1].replace(System.getProperty("line.separator"), "");
+				params[4].replace(System.getProperty("line.separator"), "/n");		
 		    	String feed = "http://www.trueffelscout.de/mobile/save_mobile_message.php?key=biri&name="+params[1]+"&phone="+params[2]+"&mail="+params[3]+"&message="+params[4]+"&language="+params[5];
 		    	url = new URL(feed);
 		    	
 		    	URLConnection connection = url.openConnection();
 		    	HttpURLConnection httpconn = (HttpURLConnection) connection;
+		    	httpconn.setRequestProperty("Content-Type", "text/plain"); 
+		    	httpconn.setRequestProperty("charset", "utf-8");
 		    	
 		    	int responseCode = httpconn.getResponseCode();
 		    	
@@ -108,6 +111,8 @@ public class MessageAsyncTask extends AsyncTask<String, Void, String> {
 		    		this.field=Integer.parseInt(field_node.getTextContent());
 		    		publishProgress();
 		    	}
+		    	httpconn.disconnect();
+		    	
 			}catch (MalformedURLException e) {
 				e.printStackTrace();
 				return null;

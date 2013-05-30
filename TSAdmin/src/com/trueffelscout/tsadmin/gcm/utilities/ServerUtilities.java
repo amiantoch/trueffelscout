@@ -29,14 +29,14 @@ public class ServerUtilities{
 	    String result = post(SERVER_URL, params);
 	    if(result!=null){
 	    	try {
-				JSONObject json = new JSONObject(result);
-				result = json.getString("registerResult");
+				/*JSONObject json = new JSONObject(result);
+				result = json.getString("registerResult");*/
 		    	if(result.equalsIgnoreCase("Success")||result.equalsIgnoreCase("ok")){
 		    		GCMRegistrar.setRegisteredOnServer(context, true);
 		    	}else{
 		    		new AlertDialogManager().showAlertDialog(context, "Error", "register could not be done", false);
 		    	}
-	    	} catch (JSONException e) {
+	    	} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

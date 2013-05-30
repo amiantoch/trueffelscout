@@ -238,7 +238,7 @@ public class TSMessagesActivity extends SherlockActivity {
 			}
 		});
     	
-    	Button btnUnreg = (Button) findViewById(R.id.btnRegister);
+    	Button btnUnreg = (Button) findViewById(R.id.btnUnregister);
     	btnUnreg.setOnClickListener(new View.OnClickListener() {
 			
 			public void onClick(View v) {
