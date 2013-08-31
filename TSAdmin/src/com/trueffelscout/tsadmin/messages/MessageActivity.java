@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.actionbarsherlock.view.MenuItem;
 import com.trueffelscout.tsadmin.R;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,14 +16,16 @@ import android.widget.Toast;
 
 import com.trueffelscout.tsadmin.TSActivity;
 import com.trueffelscout.tsadmin.model.Message;
+import com.trueffelscout.tsadmin.model.MessageController;
 import com.trueffelscout.tsadmin.model.Trueffel;
 import com.trueffelscout.tsadmin.trueffels.TrueffelActivity;
 
-public class MessageActivity extends TSActivity {
+public class MessageActivity extends TSActivity{
 	
 	private Message message;
 	private TextView phone;
 	private TextView mail;
+	private TextView msgDate;
 	private ImageView callBtn;
 	private ImageView smsBtn;
 	private ImageView mailBtn;
@@ -32,7 +35,9 @@ public class MessageActivity extends TSActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message_activity);
 		message = (Message) getIntent().getSerializableExtra("message");
-		
+		if(!MessageController.getInstance(getApplicationContext()).isMessageSeen(message)){
+			MessageController.getInstance(getApplicationContext()).addSeenMessage(message);
+		}
 		initActionBar();
 		
 		TextView name = (TextView)findViewById(R.id.msg_name);
@@ -47,8 +52,8 @@ public class MessageActivity extends TSActivity {
 		if(message.getMail()!=null){
 			mail.setText(message.getMail());
 		}
-		TextView date = (TextView)findViewById(R.id.msg_date);
-		date.setText(message.getDate());
+		msgDate = (TextView)findViewById(R.id.msg_date);
+		msgDate.setText(message.getDate());
 		TextView msg = (TextView)findViewById(R.id.msg_msg);
 		if(message.getMessage()!=null){
 			msg.setText(message.getMessage());
@@ -69,6 +74,7 @@ public class MessageActivity extends TSActivity {
 	public boolean onOptionsItemSelected(MenuItem item){
 		switch(item.getItemId()){
 		case android.R.id.home:
+			this.setResult(Activity.RESULT_OK);
 			finish();
 			break;
 		}
@@ -78,7 +84,12 @@ public class MessageActivity extends TSActivity {
 	@Override
 	public void update(ArrayList<Trueffel> trufe) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	@Override
+	public void onBackPressed(){
+		setResult(RESULT_OK);
+		super.onBackPressed();
 	}
 	
 	public ImageView getCallButton(){
@@ -134,6 +145,12 @@ public class MessageActivity extends TSActivity {
 			});
 		}
 		return smsBtn;
+	}
+
+	@Override
+	public void setProgress(boolean show) {
+		// TODO Auto-generated method stub
+		setProgressBarIndeterminateVisibility(show);
 	}
 	
 }

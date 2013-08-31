@@ -75,6 +75,7 @@ public class TrueffelSettingsActivity extends TSActivity {
 		
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setTitle(getString(R.string.trufffles));
 		
 		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.back);
         BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
@@ -97,6 +98,7 @@ public class TrueffelSettingsActivity extends TSActivity {
 			pb.setVisibility(View.GONE);
 			RelativeLayout tr_sett = (RelativeLayout)findViewById(R.id.trufa_settings);
 			tr_sett.setVisibility(View.VISIBLE);
+			
 			ImageButton cam = (ImageButton) findViewById(R.id.camButton);
 			cam.setOnClickListener(new OnClickListener(){
 				public void onClick(View arg0) {
@@ -176,17 +178,25 @@ public class TrueffelSettingsActivity extends TSActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	    case android.R.id.home:
+	    	setResult(RESULT_CANCELED);
 	        finish();
 	        break; 
 	    }
 	    return true;
 	}
+	
+	@Override
+	public void setProgress(boolean show) {
+		setProgressBarIndeterminateVisibility(show);
+	}
+	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if(requestCode == CAM_REQUEST && resultCode == RESULT_OK){
 			this.newImgBmp = (Bitmap) data.getExtras().get("data");
 			this.img.setImageBitmap(newImgBmp);
 			CheckBox img_upload = (CheckBox)findViewById(R.id.edit_img_confirm);
 			img_upload.setVisibility(View.VISIBLE);
+			img_upload.setChecked(true);
 		}
 	}
 	
@@ -196,10 +206,20 @@ public class TrueffelSettingsActivity extends TSActivity {
 		this.id_trufa = this.getIntent().getIntExtra("id",-1);
 	}
 	
+	@Override
+	public void onBackPressed(){
+		setResult(RESULT_CANCELED);
+		super.onBackPressed();
+	}
+	
+	
 	public void saveTrufa(View view){
-		new SaveTrueffelAsyncTask().execute(new String[]{});
+		if(((EditText) findViewById(R.id.edit_name_trufa)).getText().toString().length()>0){
+			new SaveTrueffelAsyncTask().execute();
+		}
 	}
 	public void cancelTrufa(View view){
+		setResult(RESULT_CANCELED);
 		this.finish();
 	}
 	
@@ -249,6 +269,7 @@ public class TrueffelSettingsActivity extends TSActivity {
 		char_et.setHeight(LayoutParams.WRAP_CONTENT);
 		char_et.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 		char_et.setText(car);
+		char_et.setHint(getString(R.string.typeA));
 		
 		EditText pr_et = new EditText(this);
 		pr_et.setWidth(100);
@@ -256,7 +277,10 @@ public class TrueffelSettingsActivity extends TSActivity {
 		pr_et.setInputType(InputType.TYPE_CLASS_NUMBER);
 		pr_et.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
 		pr_et.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-		pr_et.setText(String.valueOf(price));
+		pr_et.setHint("0");
+		if(price != 0){
+			pr_et.setText(String.valueOf(price));
+		}
 		
 		switch(id){
 			case -1:char_et.setId(R.id.add_char);
@@ -359,17 +383,20 @@ public class TrueffelSettingsActivity extends TSActivity {
 		
 		@Override
 		public void onPostExecute(String result){
-			//pd.setMessage("Done!");
-			if(result!=null) Toast.makeText(TrueffelSettingsActivity.this, result, Toast.LENGTH_LONG).show();
-			pd.setMessage(result);
-			pd.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-				
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					dialog.dismiss();
-				}
-			});
-			//pd.dismiss();
+			if(result!=null){
+				pd.dismiss();
+				setResult(RESULT_OK);
+				finish();
+			}else{
+				pd.setMessage(getString(R.string.save_truffel_error));
+				pd.setButton(DialogInterface.BUTTON_NEGATIVE, "Ok", new DialogInterface.OnClickListener() {
+					
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						dialog.dismiss();
+					}
+				});
+			}
 		}
 		
 		private void readActivityInJSON(){
@@ -407,15 +434,21 @@ public class TrueffelSettingsActivity extends TSActivity {
 					typeUptJson.put("id_trueffel", id_trufa);
 					LinearLayout ll = (LinearLayout)upt_price_layout.getChildAt(i);
 					EditText et_cat = (EditText)ll.getChildAt(0);
-					typeUptJson.put("category", et_cat.getText());
 					EditText et_pr = (EditText)ll.getChildAt(1);
-					typeUptJson.put("price", et_pr.getText());
+					if(et_cat.getText().toString().length()>0){
+						typeUptJson.put("category", et_cat.getText());
+					}
+					if(et_pr.getText().toString().length() > 0){
+						typeUptJson.put("price", et_pr.getText());
+					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					Log.e("readActivityInJSON","Json error");
 				}
-				updateTypesJson.put(typeUptJson);
+				if(typeUptJson.length()>0){
+					updateTypesJson.put(typeUptJson);
+				}
 			}
 			
 			JSONArray addTypesJson = new JSONArray();
@@ -426,15 +459,19 @@ public class TrueffelSettingsActivity extends TSActivity {
 					typeAddJson.put("id_trueffel", id_trufa);
 					LinearLayout ll = (LinearLayout)add_price_layout.getChildAt(i);
 					EditText et_cat = (EditText)ll.getChildAt(0);
-					typeAddJson.put("category", et_cat.getText());
 					EditText et_pr = (EditText)ll.getChildAt(1);
-					typeAddJson.put("price", et_pr.getText());
+					if(et_cat.getText().toString().length()>0 && et_pr.getText().toString().length() > 0){
+						typeAddJson.put("category", et_cat.getText());
+						typeAddJson.put("price", et_pr.getText());
+					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					Log.e("readActivityInJSON","Json error");
 				}
-				addTypesJson.put(typeAddJson);
+				if(typeAddJson.length()>0){
+					addTypesJson.put(typeAddJson);
+				}
 			}
 			
 			JSONObject typesJson = new JSONObject();
@@ -470,6 +507,5 @@ public class TrueffelSettingsActivity extends TSActivity {
 		 }
 
 	}
-	
 
 }

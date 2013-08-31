@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -25,6 +26,10 @@ public class MessagesAsynkTask extends AsyncTask<String, Void, ArrayList<Message
 	
 	public MessagesAsynkTask(TSMessagesActivity activity){
 		this.activity = activity;
+	}
+	
+	public void onPreExecute(){
+		activity.getProgressBar().setVisibility(View.VISIBLE);
 	}
 	
 	@Override
@@ -72,6 +77,7 @@ public class MessagesAsynkTask extends AsyncTask<String, Void, ArrayList<Message
 	
 	@Override
 	protected void onPostExecute(ArrayList<Message> result){
+		activity.getProgressBar().setVisibility(View.GONE);
 		if(result!=null){
 			activity.update(result);
 		}else{

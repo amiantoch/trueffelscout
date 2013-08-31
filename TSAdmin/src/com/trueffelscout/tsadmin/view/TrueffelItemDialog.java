@@ -31,12 +31,12 @@ public class TrueffelItemDialog extends Dialog implements OnClickListener{
 	    setContentView(R.layout.trueffe_item_dialog);
 		delTrufa = (Button)findViewById(R.id.button_delete_trueffel);
 		delTrufa.setOnClickListener(this);
-		editTrufa = (Button)findViewById(R.id.button_edit_trueffel);
-		editTrufa.setOnClickListener(this);
+		//editTrufa = (Button)findViewById(R.id.button_edit_trueffel);
+		//editTrufa.setOnClickListener(this);
 	}
 
 	public void onClick(View v) {
-		if(v==this.delTrufa){
+		//if(v==this.delTrufa){
 			JSONObject json = new JSONObject();
 			try {
 				json.put("delete_trueffel", this.idTrufa);
@@ -46,13 +46,14 @@ public class TrueffelItemDialog extends Dialog implements OnClickListener{
 			}
 			new EditTrueffelAsyncTask(this.context).execute(new String[]{json.toString()});
 			this.dismiss();
-			
+		/*	
 		}else if(v==this.editTrufa){
 			Intent editIntent = new Intent(this.context, TrueffelSettingsActivity.class);
 			editIntent.putExtra("id", this.idTrufa);
 			this.context.startActivity(editIntent);
 			this.dismiss();
 		}
+		*/
 	}
 
 }

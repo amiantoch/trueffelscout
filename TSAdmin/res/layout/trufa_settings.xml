@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginRight="8dp"
-            android:visibility="gone" >
+            android:visibility="visible" >
 
             <EditText
                 android:id="@+id/edit_name_trufa"
@@ -25,8 +25,8 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="15dp"
                 android:ems="10"
-                android:inputType="textMultiLine"
-                android:text="@string/trufa_name" />
+                android:hint="@string/trufa_name"
+                android:inputType="textMultiLine" />
 
             <RadioGroup
                 android:id="@+id/radioGroup1"
@@ -90,8 +90,8 @@
                         android:id="@+id/add_char"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
+                        android:hint="@string/typeA"
                         android:inputType="text|textMultiLine"
-                        android:text="@string/typeA"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <EditText
@@ -99,8 +99,8 @@
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:inputType="number"
-                        android:text="0" />
+                        android:hint="0"
+                        android:inputType="number" />
 
                     <TextView
                         android:id="@+id/textView0"
@@ -196,11 +196,12 @@
 
             <ImageButton
                 android:id="@+id/camButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_below="@+id/edit_add_pricechar"
                 android:layout_marginTop="15dp"
-                android:src="@drawable/kontakt" />
+                android:scaleType="centerInside"
+                android:src="@drawable/foto_camera" />
 
             <EditText
                 android:id="@+id/edit_descr"
@@ -210,8 +211,8 @@
                 android:layout_below="@id/camButton"
                 android:layout_marginTop="15dp"
                 android:ems="10"
-                android:inputType="textMultiLine"
-                android:text="@string/descr" />
+                android:hint="@string/descr"
+                android:inputType="textMultiLine" />
 
             <requestFocus />
 

@@ -9,7 +9,7 @@
     <string name="new_msg">No messages</string>
     <string name="euro">€/kg</string>
     <string name="save">Save</string>
-    <string name="typeA">Type A</string>
+    <string name="typeA">Type</string>
     <string name="typeB">Type B</string>
     <string name="typeC">Type C</string>
     <string name="descr">Description</string>
@@ -17,10 +17,13 @@
     <string name="vis_public">Public</string>
     <string name="vis_private">Private</string>
     <string name="cancel">Cancel</string>
-    <string name="img_upload">Set image as default icon</string>
+    <string name="img_upload">Check to save image</string>
     <string name="notificationMsg">Trebe trufe!!!</string>
     <string name="delete_trueffel_txt">Delete trueffel</string>
     <string name="edit_trueffel_txt">Edit trueffel</string>
+    <string name="save_truffel_successfully">Successfully saved!</string>
+    <string name="save_truffel_error">An errorm occured while saving truffel!</string>
+    <string name="trufffles">Truffles</string>
     
     <string name="messages">Messages</string>
     <string name="home">Home</string>
@@ -36,7 +39,7 @@
     
     <string name="unit">€/kg</string>
     <string name="unit_eur">€</string>
-    <string name="from">From</string>
+    <string name="from">From:</string>
     <string name="tel">Tel:</string>
     <string name="mail">Mail:</string>
     <string name="reveived">Received:</string>

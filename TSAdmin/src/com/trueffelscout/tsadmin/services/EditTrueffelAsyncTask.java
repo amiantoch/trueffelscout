@@ -30,6 +30,11 @@ public class EditTrueffelAsyncTask extends AsyncTask<String, Void, String> {
 	public EditTrueffelAsyncTask(TrueffelActivity activity){
 		this.activity = activity;
 	}
+	
+	@Override
+	public void onPreExecute(){
+		activity.setProgress(true);
+	}
 
 	@Override
 	protected String doInBackground(String... params) {
@@ -84,7 +89,7 @@ public class EditTrueffelAsyncTask extends AsyncTask<String, Void, String> {
 	@Override
 	protected void onPostExecute(String result){
 		if(result!=null){
-			new TrueffelAsyncTask(this.activity).execute(new String[]{"http://www.trueffelscout.de/mobile/TSadmin.php"});
+			new TrueffelAsyncTask(this.activity).execute();
 			//Toast.makeText(activity, result, Toast.LENGTH_SHORT).show();
 		}
 	}

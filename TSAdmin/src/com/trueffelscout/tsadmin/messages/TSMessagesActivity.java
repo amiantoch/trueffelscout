@@ -2,10 +2,7 @@ package com.trueffelscout.tsadmin.messages;
 
 import static com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities.SETTINGS;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -21,36 +18,39 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-import com.trueffelscout.tsadmin.R;
 
 import com.actionbarsherlock.ActionBarSherlock;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gcm.GCMRegistrar;
+import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.haarman.listviewanimations.itemmanipulation.SwipeDismissListViewTouchListener;
+import com.trueffelscout.tsadmin.R;
 import com.trueffelscout.tsadmin.gcm.utilities.CommonUtilities;
 import com.trueffelscout.tsadmin.gcm.utilities.ServerUtilities;
 import com.trueffelscout.tsadmin.gcm.utilities.WakeLocker;
 import com.trueffelscout.tsadmin.model.Message;
+import com.trueffelscout.tsadmin.model.MessageController;
 import com.trueffelscout.tsadmin.services.MessagesAsynkTask;
-import com.trueffelscout.tsadmin.trueffels.TrueffelActivity;
 
 public class TSMessagesActivity extends SherlockActivity {
-	private static final String MSG_ID = "seen_message_id";
+	private static final int messageRequestCode = 1;
 	
 	private AsyncTask<Void, Void, Void> mRegisterTask;
 	private ArrayList<Message> messages = new ArrayList<Message>();
 	private String name;
 	private String email;
-	private int[] msgSeenId;
 	private TextView lblMessage;
 	private ListView msgList;
 	private MessageAdapter adapter;
@@ -76,7 +76,7 @@ public class TSMessagesActivity extends SherlockActivity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		 getSupportMenuInflater().inflate(R.menu.activity_massages, menu);
+		// getSupportMenuInflater().inflate(R.menu.activity_massages, menu);
 		return true;
 	}
 	
@@ -86,14 +86,25 @@ public class TSMessagesActivity extends SherlockActivity {
 	    case android.R.id.home:
 	        finish();
 	        break; 
+	        /*
 	    case R.id.menu_settings:
 	    	register();
 	    	break;
+	    	*/
 	    }
 	    return true;
 	}
 	
+	public ProgressBar getProgressBar(){
+		return (ProgressBar) findViewById(R.id.progressBarMsg);
+	}
 	
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == messageRequestCode && resultCode == Activity.RESULT_OK){
+			update(messages);
+		}
+	}
 	
 	/*
 	@Override
@@ -234,6 +245,7 @@ public class TSMessagesActivity extends SherlockActivity {
 				spEdit.putString("email", email.getText().toString());
 				spEdit.commit();
 				GCMRegistrar.register(TSMessagesActivity.this, CommonUtilities.SENDER_ID);
+				new MessagesAsynkTask(TSMessagesActivity.this).execute(new String[]{});
 				flipper.showPrevious();
 			}
 		});
@@ -261,14 +273,22 @@ public class TSMessagesActivity extends SherlockActivity {
     	msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				if(msgSeenId[position]==0){
-					msgSeenId[position] = 1;
-				}
 				Intent intent = new Intent(TSMessagesActivity.this, MessageActivity.class);
 				intent.putExtra("message", messages.get(position));
-				startActivity(intent);
+				startActivityForResult(intent, messageRequestCode);
 			}
 		});
+    	SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(msgList, new OnDismissCallback() {
+			public void onDismiss(AbsListView listView,	int[] reverseSortedPositions) {
+				for (int position : reverseSortedPositions) {
+    				Toast.makeText(getApplicationContext(), "Trufa:"+String.valueOf(position), Toast.LENGTH_SHORT).show();
+    				MessageController.getInstance(getApplicationContext()).addDeletedMsg(messages.get(position));
+    				messages.remove(position);
+    				update(messages);
+    			}
+			}
+		});
+	  msgList.setOnTouchListener(touchListener);
     }
  
     @Override
@@ -297,10 +317,8 @@ public class TSMessagesActivity extends SherlockActivity {
 
 	public void update(ArrayList<Message> messages) {
 		setSupportProgressBarIndeterminateVisibility(false);
-		this.messages = messages;
-		if(msgSeenId == null){
-			msgSeenId = new int[messages.size()];
-		}
+		ArrayList<Message> messagesFiltered = MessageController.getInstance(this).filterDeletedMessages(messages);
+		this.messages = messagesFiltered;
 		adapter = new MessageAdapter();
 		//this.adapter.notifyDataSetChanged();
 		this.msgList.setAdapter(adapter);
@@ -318,15 +336,19 @@ public class TSMessagesActivity extends SherlockActivity {
 	            LayoutInflater inflater = TSMessagesActivity.this.getLayoutInflater();
 	            v = inflater.inflate(R.layout.tsmessages_item, parent, false);
 			}
-			if(msgSeenId==null || msgSeenId[position]==0){
-				v.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+			if(!MessageController.getInstance(getApplicationContext()).isMessageSeen(messages.get(position))){
+				v.setBackground(getResources().getDrawable(R.drawable.background_message_read_item));
+			}else{
+				v.setBackground(getResources().getDrawable(R.drawable.background_message_item));
 			}
             TextView name = (TextView)v.findViewById(R.id.user_name);
+            String who = "";
             if(messages.get(position).getName()!=null){
-	            String who = messages.get(position).getName().length()>0?messages.get(position).getName():
-	            	messages.get(position).getMail();
+	            who = messages.get(position).getName().length()>0?messages.get(position).getName():
+	            	messages.get(position).getMail().length()>0?messages.get(position).getMail():
+	            		messages.get(position).getPhone();
             }
-            name.setText(messages.get(position).getName());
+            name.setText(who);
             if(messages.get(position).getMessage()!=null){
 	            String msgTxt = messages.get(position).getMessage().length()>30?
 	            		messages.get(position).getMessage().substring(0, 30)+"...":

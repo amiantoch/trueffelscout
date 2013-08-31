@@ -38,4 +38,6 @@ public abstract class TSActivity extends SherlockActivity {
 	    return orientation;
 	}
 	
+	public abstract void setProgress(boolean show);
+	
 }

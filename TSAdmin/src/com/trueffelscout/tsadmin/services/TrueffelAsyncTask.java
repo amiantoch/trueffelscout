@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -19,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -30,18 +26,11 @@ import com.trueffelscout.tsadmin.model.TrueffelType;
 import com.trueffelscout.tsadmin.trueffels.TrueffelActivity;
 
 public class TrueffelAsyncTask extends AsyncTask<String,Void,ArrayList<Trueffel>>{
-
+	private static final String url = "http://www.trueffelscout.de/mobile/TSadmin.php";
 	private TSActivity activity;
-	private ProgressDialog pd;
 	
 	public TrueffelAsyncTask(TSActivity activity){
 		this.activity = activity;
-	}
-	
-	@Override 
-	protected void onPreExecute(){
-		//ProgressBar pb = (ProgressBar)activity.findViewById(R.id.progressBar);
-		//pb.setVisibility(View.VISIBLE);
 	}
 	
 	@Override
@@ -49,14 +38,10 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,ArrayList<Trueffel>
 		// TODO Auto-generated method stub
 		ArrayList<Trueffel> trufe_loc;
 		trufe_loc = new ArrayList<Trueffel>();
-		StringBuilder builder = new StringBuilder();
 		HttpClient httpcl = new DefaultHttpClient();
     	HttpGet httpget = new HttpGet();
     	try{
-    		//List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-    		//nameValuePairs.add(new BasicNameValuePair("user", "1"));
-            //httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-    		httpget.setURI(new URI(params[0]));
+    		httpget.setURI(new URI(url));
     		ResponseHandler<String> responseHandler = new BasicResponseHandler();
     		String response = httpcl.execute(httpget,responseHandler);
 
@@ -102,7 +87,7 @@ public class TrueffelAsyncTask extends AsyncTask<String,Void,ArrayList<Trueffel>
 	
 	@Override
 	protected void onPostExecute(final ArrayList<Trueffel> result){
-		//pd.dismiss();
+		activity.setProgress(false);
 		if(result==null){
 			Toast.makeText(activity, "No truffles availible!", Toast.LENGTH_SHORT).show();
 		}else{

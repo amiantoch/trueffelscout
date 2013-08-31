@@ -2,7 +2,6 @@ package com.trueffelscout.tsadmin.trueffels;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,8 +11,6 @@ import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +25,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.trueffelscout.tsadmin.R;
 import com.trueffelscout.tsadmin.TSActivity;
 import com.trueffelscout.tsadmin.messages.TSMessagesActivity;
@@ -37,23 +35,29 @@ import com.trueffelscout.tsadmin.services.TrueffelAsyncTask;
 import com.trueffelscout.tsadmin.view.TrueffelItemDialog;
 
 public class TrueffelActivity extends TSActivity{
+	protected static final int editRequestCode = 1;
 	private int SCREEN_ORIENTATION=0;
-	//private ArrayList<Trueffel> trufe;
+	
 	private IntentFilter mNetworkStateChangedFilter;
     private BroadcastReceiver mNetworkStateIntentReceiver;
     private ListView truf_list;
     private ArrayAdapter<Trueffel> adapter;
+    private ProgressBar pb;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setSupportProgressBarIndeterminateVisibility(false);
         setContentView(R.layout.activity_main);
         
         this.SCREEN_ORIENTATION = getScreenOrientation();
-        getSupportActionBar().setTitle("Home");
-       	checkNetwork();
+        if(savedInstanceState == null){
+        	checkNetwork();
+        }
+        getSupportActionBar().setTitle(getString(R.string.home));
         initListView();
-        
+        pb = (ProgressBar)findViewById(R.id.progressBar);
     }
     
     private void checkNetwork(){
@@ -72,11 +76,12 @@ public class TrueffelActivity extends TSActivity{
 							if(dialog.isShowing()){
 								dialog.dismiss();
 							}
-							((ProgressBar)findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
-							if(getTrufe().size()>=0){
-								setSupportProgressBarIndeterminate(true);
+							if(adapter != null && adapter.getCount()==0){
+								((ProgressBar)findViewById(R.id.progressBar)).setVisibility(View.VISIBLE);
+								new TrueffelAsyncTask(TrueffelActivity.this).execute();
+							}else{
+								update(TrueffelsHolder.getTruffels());
 							}
-							new TrueffelAsyncTask(TrueffelActivity.this).execute(new String[]{"http://www.trueffelscout.de/mobile/TSadmin.php"});
 						}
 					}
 		    }
@@ -91,13 +96,13 @@ public class TrueffelActivity extends TSActivity{
 	        		Intent editIntent = new Intent(TrueffelActivity.this, TrueffelSettingsActivity.class);
 	        		editIntent.putExtra("id", getTrufe().get(pos).id);
 	        		editIntent.putExtra("pos", pos);
-	        		startActivity(editIntent);
+	        		startActivityForResult(editIntent,editRequestCode);
         	}
         });
         truf_list.setOnItemLongClickListener(new OnItemLongClickListener(){
 
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,int pos, long id) {
-				new TrueffelItemDialog(TrueffelActivity.this, getTrufe().get(pos).id).show();
+				new TrueffelItemDialog(TrueffelActivity.this, adapter.getItem(pos).id).show();
 				return false;
 			}
         	
@@ -119,7 +124,19 @@ public class TrueffelActivity extends TSActivity{
             	startActivity(item.getIntent());
             	break;
         }
-        return true;//super.onOptionsItemSelected(item);
+        return true;
+    }
+    
+    public void setProgress(boolean show){
+    	//setProgressBarIndeterminateVisibility(show);
+    	if(pb.isShown()){
+    		pb.setVisibility(View.GONE);
+    	}else{
+    		adapter.clear();
+    		adapter.notifyDataSetChanged();
+    		truf_list.setAdapter(adapter);
+    		pb.setVisibility(View.VISIBLE);
+    	}
     }
     
     @Override
@@ -154,6 +171,15 @@ public class TrueffelActivity extends TSActivity{
 	    super.onBackPressed();
 	}
 	
+	@Override
+	public void onActivityResult(int requestCode,int resultCode,Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == editRequestCode && resultCode == RESULT_OK){
+			setProgress(true);
+			new TrueffelAsyncTask(this).execute();
+		}
+	}
+	
 	public ArrayList<Trueffel> getTrufe(){
 		return TrueffelsHolder.getTruffels();
 	}
@@ -167,7 +193,6 @@ public class TrueffelActivity extends TSActivity{
 		adapter = new TrueffelAdapter(TrueffelActivity.this, R.layout.item_trufa,trufe);
 		truf_list.setAdapter(adapter);
 		findViewById(R.id.trufeLayout).setVisibility(View.VISIBLE);
-		ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar);
 		pb.setVisibility(View.GONE);
 		setSupportProgressBarIndeterminateVisibility(false);
 	}
@@ -175,7 +200,7 @@ public class TrueffelActivity extends TSActivity{
 	public void addTrufa(View view){
 		Intent editIntent = new Intent(TrueffelActivity.this, TrueffelSettingsActivity.class);
 		editIntent.putExtra("id", -1);
-		startActivity(editIntent);
+		startActivityForResult(editIntent,editRequestCode);
 	}
     
     public AlertDialog createDialog(){
@@ -218,7 +243,11 @@ public class TrueffelActivity extends TSActivity{
 	        Trueffel trufa = this.trufead.get(position);
 	        
 	        ImageView img = (ImageView)v.findViewById(R.id.trufa_img);
-	        if(trufa.image!=null) img.setImageDrawable(trufa.image);
+	        if(trufa.image!=null){
+	        	img.setImageDrawable(trufa.image);
+	        }else{
+	        	img.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+	        }
 	        TextView pr1 = (TextView)v.findViewById(R.id.trufa_price1);
 	        pr1.setTypeface(tf);
 	        TextView pr2 = (TextView)v.findViewById(R.id.trufa_price2);
